@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PixelG - Token</title>
+  <link rel="icon" href="logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+  <script src="https://unpkg.com/@web3modal/standalone@2.6.2"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+    }
+    .scene {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      max-height: 450px;
+      background: url('pacman-bg.webp') center center no-repeat;
+      background-size: cover;
+      animation: move 30s linear infinite;
+      opacity: 0.12;
+    }
+    @keyframes move {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .content {
+      position: relative;
+      z-index: 2;
+      padding-top: 30px;
+    }
+    .content img {
+      width: 100px;
+      height: auto;
+    }
+    .btn {
+      background-color: #e53935;
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      margin: 0.3rem;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .btn:hover {
+      background-color: #ef5350;
+    }
+    .section {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 2rem;
+      margin: 2rem auto;
+      max-width: 800px;
+      border-radius: 10px;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      max-width: 600px;
+      height: 400px;
+    }
+    footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .social {
+      margin-top: 1rem;
+    }
+    .social a {
+      color: #00ffff;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    input, button {
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="scene"></div>
+  <div class="content">
+    <img src="logo.png" alt="PixelG Logo" />
+    <h1>PixelG Token</h1>
+    <p>PixelG is a gamer-centric BEP-20 token empowering play-to-earn, funding games & building community.</p>
+    <button class="btn" onclick="window.open('https://pancakeswap.finance/swap?outputCurrency=0x7C7fdB3013C0786f5C84d51dC05b999AF1759Cd7','_blank')">Buy PXG on PancakeSwap</button>
+    <button class="btn" onclick="window.open('https://bscscan.com/address/0x7C7fdB3013C0786f5C84d51dC05b999AF1759Cd7','_blank')">View on BscScan</button>
+    <button class="btn" onclick="window.open('https://x.com/PixelGcoin','_blank')">Follow on Twitter</button>
+  </div>
+
+  <div class="section">
+    <h2>🪙 PXG Direkt kaufen</h2>
+    <input type="number" id="bnbAmount" placeholder="BNB Betrag" />
+    <p id="pxgEstimate">Du erhältst: 0 PXG</p>
+    <button class="btn" onclick="buyPXG()">Jetzt kaufen</button>
+    <p id="buyStatus"></p>
+  </div>
+
+  
+<div class="section">
+  <h2>📄 Whitepaper</h2>
+  <p>Alle Infos zu unserem Projekt, Tokenomics, Roadmap & mehr:</p>
+  <a href="PixelG_Whitepaper_English.pdf" class="btn" download>📥 Whitepaper herunterladen (PDF)</a>
+</div>
+
+<div class="section">
+  <h2>📄 Whitepaper Vorschau</h2>
+  <iframe src="PixelG_Whitepaper_English.pdf" width="100%" height="600px"></iframe>
+</div>
+
+<div class="section">
+  <h2>📊 PXG Verkaufsstatistik</h2>
+    <p id="pxgSold">Lade Verkaufsdaten...</p>
+    <p id="buyerCount">Lade Käuferanzahl...</p>
+  </div>
+
+  <footer>
+    <div class="social">
+      <a href="https://bscscan.com/address/0x7C7fdB3013C0786f5C84d51dC05b999AF1759Cd7" target="_blank">View on BSCScan</a> |
+      <a href="https://x.com/PixelGcoin" target="_blank">Twitter</a>
+    </div>
+    <p>Contract: 0x7C7fdB3013C0786f5C84d51dC05b999AF1759Cd7</p>
+    <p>© 2025 PixelG Project</p>
+  </footer>
+
+<script>
+const saleContract = '0x47d54489aebdb0e720316f6e9b83e9f5a16fe769';
+const saleAbi = [
+  'function totalSold() view returns (uint256)'
+];
+const pricePerTokenWei = 10000000000000;
+
+async function buyPXG() {
+  const web3modal = new window.Web3Modal.default({ projectId: 'abc1234567890defabcdef1234567890' });
+  const instance = await web3modal.connect();
+  const provider = new ethers.BrowserProvider(instance);
+  const signer = await provider.getSigner();
+  const amount = document.getElementById('bnbAmount').value;
+
+  try {
+    document.getElementById('buyStatus').innerText = 'Transaktion wird gesendet...';
+    const tx = await signer.sendTransaction({
+      to: saleContract,
+      value: ethers.parseEther(amount)
+    });
+    await tx.wait();
+    document.getElementById('buyStatus').innerText = '✅ PXG erfolgreich gekauft!';
+  } catch (err) {
+    console.error(err);
+    document.getElementById('buyStatus').innerText = '❌ Fehler beim Kauf.';
+  }
+}
+
+document.getElementById('bnbAmount').addEventListener('input', (e) => {
+  const wei = ethers.parseEther(e.target.value || '0');
+  const amount = wei * BigInt(1e18) / BigInt(pricePerTokenWei);
+  document.getElementById('pxgEstimate').innerText = `Du erhältst: ${ethers.formatUnits(amount, 18)} PXG`;
+});
+
+async function loadTotalSold() {
+  const provider = new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+  const contract = new ethers.Contract(saleContract, saleAbi, provider);
+  const sold = await contract.totalSold();
+  document.getElementById('pxgSold').innerText = `Verkauft: ${ethers.formatUnits(sold, 18)} PXG`;
+}
+
+loadTotalSold();
+loadBuyerCount();
+
+async function loadBuyerCount() {
+  const buyerAbi = ['function getBuyerList() view returns (address[])'];
+  const provider = new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+  const contract = new ethers.Contract(saleContract, buyerAbi, provider);
+  const buyers = await contract.getBuyerList();
+  document.getElementById('buyerCount').innerText = `🧑‍🤝‍🧑 Käufer: ${buyers.length}`;
+}
+
+</script>
+</body>
+</html>
