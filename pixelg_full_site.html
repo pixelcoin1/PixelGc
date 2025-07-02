@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PixelG</title>
+  <link rel="icon" href="logo.png">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: url('06.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      text-align: center;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .dark-mode {
+      background-color: #121212;
+      color: #f0f0f0;
+    }
+    .lang-select {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    .container {
+      padding-top: 15vh;
+    }
+    h1 {
+      font-size: 3em;
+    }
+    .btn {
+      padding: 1em 2em;
+      margin: 1em;
+      border: none;
+      border-radius: 8px;
+      background: #ff4081;
+      color: white;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #e91e63;
+    }
+    .mode-toggle {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #333;
+      color: white;
+      border: none;
+      padding: 0.5em 1em;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    iframe {
+      width: 90%;
+      height: 400px;
+      max-width: 800px;
+      margin-top: 40px;
+      border: none;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <button class="mode-toggle" onclick="toggleMode()">🌙 / ☀️</button>
+
+  <select class="lang-select" onchange="changeLang(this.value)">
+    <option value="de">Deutsch</option>
+    <option value="en">English</option>
+    <option value="tr">Türkçe</option>
+    <option value="es">Español</option>
+  </select>
+
+  <div class="container">
+    <img src="logo.png" alt="PixelG Logo" width="100" />
+    <h1 id="welcome">Herzlich Willkommen bei PixelG</h1>
+    <button class="btn" onclick="enterApp()">Eingang</button>
+    <button class="btn" onclick="window.open('PixelG_Whitepaper_English.pdf', '_blank')">📄 Whitepaper</button>
+  </div>
+
+  <div id="chart" style="display:none;">
+    <h2>📈 Live-Chart</h2>
+    <iframe src="https://dexscreener.com/bsc/0x7C7fdB3013C0786f5C84d51dC05b999AF1759Cd7"></iframe>
+  </div>
+
+  <script>
+    const translations = {
+      de: "Herzlich Willkommen bei PixelG",
+      en: "Welcome to PixelG",
+      tr: "PixelG'ye Hoşgeldiniz",
+      es: "Bienvenido a PixelG"
+    };
+
+    function toggleMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    function changeLang(lang) {
+      document.getElementById("welcome").innerText = translations[lang] || translations["de"];
+    }
+
+    function enterApp() {
+      document.querySelector(".container").style.display = "none";
+      document.getElementById("chart").style.display = "block";
+    }
+
+    async function autoConnectWallet() {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          console.log("Wallet connected");
+        } catch (e) {
+          console.log("Wallet connection rejected");
+        }
+      }
+    }
+
+    window.onload = autoConnectWallet;
+  </script>
+</body>
+</html>
